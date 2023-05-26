@@ -27,6 +27,7 @@ class RemoteDepthReader(BaseReader):
 
     def load_data(self, url: str) -> List[Document]:
         from tqdm.auto import tqdm
+        from unstructured.partition.auto import partition
 
         """Parse whatever is at the URL.""" ""
         RemoteReader = download_loader("RemoteReader")
@@ -57,7 +58,10 @@ class RemoteDepthReader(BaseReader):
         for depth_i in urls:
             for url in urls[depth_i]:
                 try:
-                    documents.extend(remote_reader.load_data(url))
+                    elements = partition(url=url)
+                    text = "\n\n".join([str(el) for el in elements])
+                    extra_info = {"Source": url}
+                    documents.extend([Document(text, extra_info=extra_info)])
                 except Exception as e:
                     print(f"Error reading {url} at depth {depth_i}: {e}")
                     continue
