@@ -47,6 +47,14 @@ class RemoteReader(BaseReader):
 
     def load_data(self, url: str) -> List[Document]:
         """Parse whatever is at the URL."""
+        from unstructured.partition.auto import partition
+
+        elements = partition(url=url)
+        text = "\n\n".join([str(el) for el in elements])
+        extra_info = {"Source": url}
+        documents = [Document(text, extra_info=extra_info)]
+        return documents
+
         import tempfile
         from urllib.parse import urlparse
         from urllib.request import urlopen, Request
